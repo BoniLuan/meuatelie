@@ -7,6 +7,7 @@ import { Button, Card, Dialog, Divider, List, Portal, Text } from 'react-native-
 import { clientByIdQuery, deleteClient } from '@/features/clients/repository';
 import { ordersByClientQuery } from '@/features/orders/repository';
 import { formatMoney } from '@/lib/format';
+import { openWhatsApp } from '@/lib/whatsapp';
 import { STATUS_LABELS } from '@/theme';
 import { ErrorScreen } from '@/ui/error-boundary';
 import { useFeedback } from '@/ui/feedback';
@@ -23,6 +24,14 @@ export default function ClienteDetalheScreen() {
   const client = data?.[0];
   if (!client) {
     return <ErrorScreen />;
+  }
+
+  async function handleWhatsApp() {
+    try {
+      await openWhatsApp(client!.phone);
+    } catch (e) {
+      showMessage((e as Error).message, 'error');
+    }
   }
 
   function handleDelete() {
@@ -80,6 +89,15 @@ export default function ClienteDetalheScreen() {
         )}
 
         <View style={styles.actions}>
+          <Button
+            mode="contained-tonal"
+            icon="whatsapp"
+            onPress={handleWhatsApp}
+            style={styles.action}
+            contentStyle={styles.actionContent}
+          >
+            Enviar WhatsApp
+          </Button>
           <Button
             mode="contained"
             icon="pencil"

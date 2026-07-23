@@ -9,6 +9,7 @@ import { PhotoGallery } from '@/features/orders/photo-gallery';
 import { PaymentSection } from '@/features/payments/payment-section';
 import { deleteOrder, orderByIdQuery, updateOrderStatus } from '@/features/orders/repository';
 import { formatDate, formatMoney } from '@/lib/format';
+import { openWhatsApp, orderMessage } from '@/lib/whatsapp';
 import { STATUS_LABELS } from '@/theme';
 import { ErrorScreen } from '@/ui/error-boundary';
 import { useFeedback } from '@/ui/feedback';
@@ -40,6 +41,14 @@ export default function PedidoDetalheScreen() {
       showMessage('Situação atualizada!', 'success');
     } catch {
       showMessage('Não foi possível atualizar a situação.', 'error');
+    }
+  }
+
+  async function handleWhatsApp() {
+    try {
+      await openWhatsApp(client?.phone, orderMessage(client?.name, order!.title));
+    } catch (e) {
+      showMessage((e as Error).message, 'error');
     }
   }
 
@@ -106,6 +115,15 @@ export default function PedidoDetalheScreen() {
         <PhotoGallery orderId={orderId} />
 
         <View style={styles.actions}>
+          <Button
+            mode="contained-tonal"
+            icon="whatsapp"
+            onPress={handleWhatsApp}
+            style={styles.actionBtn}
+            contentStyle={styles.actionContent}
+          >
+            Avisar no WhatsApp
+          </Button>
           <Button
             mode="contained"
             icon="pencil"

@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
-import { useTheme } from 'react-native-paper';
+import { router, Tabs } from 'expo-router';
+import { IconButton, useTheme } from 'react-native-paper';
 
 export default function TabsLayout() {
   const theme = useTheme();
@@ -30,6 +30,13 @@ export default function TabsLayout() {
           title: 'Início',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home-variant" color={color} size={size} />
+          ),
+          headerRight: () => (
+            <IconButton
+              icon="cog"
+              iconColor={theme.colors.onPrimary}
+              onPress={() => router.push('/config')}
+            />
           ),
         }}
       />

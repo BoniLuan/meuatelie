@@ -58,6 +58,7 @@ export default function RootLayout() {
                 <Stack.Screen name="pedido/novo" options={{ title: 'Novo pedido' }} />
                 <Stack.Screen name="pedido/[id]" options={{ title: 'Pedido' }} />
                 <Stack.Screen name="pedido/editar/[id]" options={{ title: 'Editar pedido' }} />
+                <Stack.Screen name="config" options={{ title: 'Ajustes' }} />
               </Stack>
             )}
           </FeedbackProvider>
