@@ -1,18 +1,55 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { runMigrations } from '@/db/migrate';
+import { AppErrorBoundary, ErrorScreen, RouteErrorBoundary } from '@/ui/error-boundary';
+import { FeedbackProvider } from '@/ui/feedback';
+import { theme } from '@/theme';
 
-SplashScreen.preventAutoHideAsync();
+// Tela de erro usada pelo expo-router para erros de rota.
+export { RouteErrorBoundary as ErrorBoundary };
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
+  const [ready, setReady] = useState(false);
+  const [dbError, setDbError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    try {
+      runMigrations();
+      setReady(true);
+    } catch (e) {
+      setDbError(e as Error);
+    }
+  }, []);
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <PaperProvider
+        theme={theme}
+        settings={{ icon: (props) => <MaterialCommunityIcons {...(props as any)} /> }}
+      >
+        <StatusBar style="light" />
+        <AppErrorBoundary>
+          <FeedbackProvider>
+            {dbError ? (
+              <ErrorScreen error={dbError} />
+            ) : !ready ? (
+              <View style={{ flex: 1, justifyContent: 'center', backgroundColor: theme.colors.background }}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+              </View>
+            ) : (
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+              </Stack>
+            )}
+          </FeedbackProvider>
+        </AppErrorBoundary>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
