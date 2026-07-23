@@ -2,9 +2,12 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Dialog, Divider, Portal, Text } from 'react-native-paper';
+import { Button, Card, Dialog, Divider, List, Portal, Text } from 'react-native-paper';
 
 import { clientByIdQuery, deleteClient } from '@/features/clients/repository';
+import { ordersByClientQuery } from '@/features/orders/repository';
+import { formatMoney } from '@/lib/format';
+import { STATUS_LABELS } from '@/theme';
 import { ErrorScreen } from '@/ui/error-boundary';
 import { useFeedback } from '@/ui/feedback';
 import { Screen } from '@/ui/screen';
@@ -14,6 +17,7 @@ export default function ClienteDetalheScreen() {
   const clientId = Number(id);
   const { showMessage } = useFeedback();
   const { data } = useLiveQuery(clientByIdQuery(clientId), [clientId]);
+  const { data: orderHistory } = useLiveQuery(ordersByClientQuery(clientId), [clientId]);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   const client = data?.[0];
@@ -50,6 +54,30 @@ export default function ClienteDetalheScreen() {
             ) : null}
           </Card.Content>
         </Card>
+
+        <Text variant="titleMedium" style={styles.sectionTitle}>
+          Pedidos deste cliente
+        </Text>
+        {orderHistory.length === 0 ? (
+          <Text variant="bodyMedium" style={styles.emptyHistory}>
+            Nenhum pedido ainda.
+          </Text>
+        ) : (
+          <Card mode="contained" style={styles.card}>
+            {orderHistory.map((o, i) => (
+              <View key={o.id}>
+                {i > 0 ? <Divider /> : null}
+                <List.Item
+                  title={o.title}
+                  description={`${STATUS_LABELS[o.status] ?? o.status} · ${formatMoney(o.price)}`}
+                  titleStyle={styles.historyTitle}
+                  right={(props) => <List.Icon {...props} icon="chevron-right" />}
+                  onPress={() => router.push(`/pedido/${o.id}`)}
+                />
+              </View>
+            ))}
+          </Card>
+        )}
 
         <View style={styles.actions}>
           <Button
@@ -110,7 +138,10 @@ const styles = StyleSheet.create({
   cardContent: { gap: 4 },
   field: { paddingVertical: 10 },
   fieldLabel: { opacity: 0.6, marginBottom: 2 },
-  actions: { gap: 12 },
+  sectionTitle: { fontWeight: 'bold', marginBottom: 8 },
+  emptyHistory: { opacity: 0.6, marginBottom: 16 },
+  historyTitle: { fontSize: 17 },
+  actions: { gap: 12, marginTop: 8 },
   action: {},
   actionContent: { height: 52 },
 });

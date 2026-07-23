@@ -17,6 +17,12 @@ export function parseMoney(text: string): number {
   return Number(normalized);
 }
 
+/** Número -> texto para campo de valor ("120.5" -> "120,5"). */
+export function moneyToInput(value?: number | null): string {
+  if (value == null || value === 0) return '';
+  return String(value).replace('.', ',');
+}
+
 /** epoch ms -> "22/07/2026" */
 export function formatDate(ms?: number | null): string {
   if (!ms) return '—';
