@@ -6,6 +6,7 @@ import { Button, Card, Dialog, Divider, Menu, Portal, Text, useTheme } from 'rea
 
 import { getClient } from '@/features/clients/repository';
 import { PhotoGallery } from '@/features/orders/photo-gallery';
+import { PaymentSection } from '@/features/payments/payment-section';
 import { deleteOrder, orderByIdQuery, updateOrderStatus } from '@/features/orders/repository';
 import { formatDate, formatMoney } from '@/lib/format';
 import { STATUS_LABELS } from '@/theme';
@@ -95,6 +96,11 @@ export default function PedidoDetalheScreen() {
         </Card>
 
         <Text variant="titleMedium" style={styles.sectionTitle}>
+          Pagamentos
+        </Text>
+        <PaymentSection orderId={orderId} price={order.price} />
+
+        <Text variant="titleMedium" style={[styles.sectionTitle, styles.sectionSpacer]}>
           Fotos
         </Text>
         <PhotoGallery orderId={orderId} />
@@ -161,6 +167,7 @@ const styles = StyleSheet.create({
   field: { paddingVertical: 10 },
   fieldLabel: { opacity: 0.6, marginBottom: 2 },
   sectionTitle: { fontWeight: 'bold', marginBottom: 10 },
+  sectionSpacer: { marginTop: 24 },
   actions: { gap: 12, marginTop: 24 },
   actionBtn: {},
   actionContent: { height: 52 },
