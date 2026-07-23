@@ -43,8 +43,18 @@ export default function RootLayout() {
                 <ActivityIndicator size="large" color={theme.colors.primary} />
               </View>
             ) : (
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
+              <Stack
+                screenOptions={{
+                  headerStyle: { backgroundColor: theme.colors.primary },
+                  headerTintColor: theme.colors.onPrimary,
+                  headerTitleStyle: { fontSize: 20, fontWeight: 'bold' },
+                  headerBackButtonDisplayMode: 'minimal',
+                }}
+              >
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="cliente/novo" options={{ title: 'Novo cliente' }} />
+                <Stack.Screen name="cliente/[id]" options={{ title: 'Cliente' }} />
+                <Stack.Screen name="cliente/editar/[id]" options={{ title: 'Editar cliente' }} />
               </Stack>
             )}
           </FeedbackProvider>
